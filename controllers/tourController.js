@@ -1,6 +1,27 @@
 const fs = require('fs');
 const Tour = require('../models/tourModel');
 
+const createTour = async (req, res) => {
+    try {
+        // const newTour = new Tour({});
+        // newTour.save()
+
+        const newTour = await Tour.create(req.body);
+
+        res.status(201).json({
+            status: 'success',
+            data: {
+                tour: newTour,
+            },
+        });
+    } catch (err) {
+        res.status(400).json({
+            status: 'fail',
+            message: 'Invalid data sent!',
+        });
+    }
+};
+
 const getAllTours = async (req, res) => {
     try {
         const tours = await Tour.find();
@@ -38,34 +59,25 @@ const getTour = async (req, res) => {
     }
 };
 
-const createTour = async (req, res) => {
+const updateTour = async (req, res) => {
     try {
-        // const newTour = new Tour({});
-        // newTour.save()
+        const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true,
+        });
 
-        const newTour = await Tour.create(req.body);
-
-        res.status(201).json({
+        res.status(200).json({
             status: 'success',
             data: {
-                tour: newTour,
+                tour,
             },
         });
     } catch (err) {
-        res.status(400).json({
+        res.status(404).json({
             status: 'fail',
-            message: 'Invalid data sent!',
+            message: err,
         });
     }
-};
-
-const updateTour = (req, res) => {
-    res.status(200).json({
-        status: 'success',
-        data: {
-            tour: '<Updated tour here...>',
-        },
-    });
 };
 
 const deleteTour = (req, res) => {
@@ -76,9 +88,9 @@ const deleteTour = (req, res) => {
 };
 
 module.exports = {
+    createTour,
     getAllTours,
     getTour,
-    createTour,
     updateTour,
     deleteTour,
 };
