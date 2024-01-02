@@ -1,0 +1,12 @@
+{
+    "name": "backend-nodejs",
+    "version": "1.0.0",
+    "description": "RestFull API with NodeJS, Express and MongoDB",
+    "main": "server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "nodemon server.js"
+    },
+    "author": "Dat Nguyen",
+    "license": "ISC"
+}
