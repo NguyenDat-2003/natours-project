@@ -47,6 +47,16 @@ const getAllTours = async (req, res) => {
         } else {
             query = query.sort('-createdAt');
         }
+
+        //3) LIMITTING
+        if (req.query.fields) {
+            const fields = req.query.fields.split(',').join(' ');
+            query = query.select(fields);
+        } else {
+            //Select tất cả ngoại trừ field: "__v"
+            query = query.select('-__v');
+        }
+
         //-------EXECUTE QUERY
         const tours = await query;
 
