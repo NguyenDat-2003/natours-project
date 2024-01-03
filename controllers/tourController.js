@@ -25,21 +25,28 @@ const createTour = async (req, res) => {
 const getAllTours = async (req, res) => {
     try {
         //-------BUILD QUERY
-        //1) Filtering
+        //1A) Filtering
         const queryObj = { ...req.query };
 
         const excludedFields = ['page', 'sort', 'limit', 'fields'];
         excludedFields.forEach((el) => delete queryObj[el]);
 
-        //2) Advance filtering: gte: greather than equal, gt: grather than,lte: less than equal
+        //1B) Advance filtering: gte: greather than equal, gt: grather than,lte: less than equal
 
         const regixAdvanceFilter = /\b(gte|gt|lte|lt)\b/g;
         let queryStr = JSON.stringify(queryObj);
         queryStr = queryStr.replace(regixAdvanceFilter, (match) => `$${match}`);
 
-        // console.log(JSON.parse(queryStr));
+        let query = Tour.find(JSON.parse(queryStr));
 
-        const query = Tour.find(JSON.parse(queryStr));
+        //2)SORTING
+        if (req.query.sort) {
+            const sortBy = req.query.sort.split(',').join(' ');
+            //Có thể sử dụng xâu chuỗi nhiều phương thức query
+            query = query.sort(sortBy);
+        } else {
+            query = query.sort('-createdAt');
+        }
         //-------EXECUTE QUERY
         const tours = await query;
 
