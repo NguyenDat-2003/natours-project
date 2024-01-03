@@ -25,12 +25,23 @@ const createTour = async (req, res) => {
 const getAllTours = async (req, res) => {
     try {
         //-------BUILD QUERY
+        //1) Filtering
         const queryObj = { ...req.query };
 
         const excludedFields = ['page', 'sort', 'limit', 'fields'];
         excludedFields.forEach((el) => delete queryObj[el]);
 
-        const query = Tour.find(queryObj);
+        //2) Advance filtering: gte: greather than equal, gt: grather than,lte: less than equal
+
+        const regixAdvanceFilter = /\b(gte|gt|lte|lt)\b/g;
+        let queryStr = JSON.stringify(queryObj);
+        queryStr = queryStr.replace(regixAdvanceFilter, (match) => `$${match}`);
+
+        // console.log(JSON.parse(queryStr));
+
+        const query = Tour.find(JSON.parse(queryStr));
+        //-------EXECUTE QUERY
+        const tours = await query;
 
         // const query =  Tour.find()
         //     .where('duration')
@@ -38,16 +49,11 @@ const getAllTours = async (req, res) => {
         //     .where('difficulty')
         //     .equals('easy');
 
-        //-------EXECUTE QUERY
-        const tours = await query;
-
         //------- SEND RESPONSE
         res.status(200).json({
             status: 'success',
             results: tours.length,
-            data: {
-                tours,
-            },
+            data: tours,
         });
     } catch (err) {
         res.status(404).json({
@@ -63,9 +69,7 @@ const getTour = async (req, res) => {
 
         res.status(200).json({
             status: 'success',
-            data: {
-                tour,
-            },
+            data: tour,
         });
     } catch (err) {
         res.status(404).json({
@@ -84,9 +88,7 @@ const updateTour = async (req, res) => {
 
         res.status(200).json({
             status: 'success',
-            data: {
-                tour,
-            },
+            data: tour,
         });
     } catch (err) {
         res.status(404).json({
