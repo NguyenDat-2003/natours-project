@@ -1,8 +1,10 @@
 const dotenv = require('dotenv');
-const app = require('./app');
 const mongoose = require('mongoose');
 
+//--------------Tạo biến môi trường trước app
 dotenv.config({ path: './.env' });
+
+const app = require('./app');
 
 const DB = process.env.DATABASE.replace(
     '<PASSWORD>',
@@ -12,6 +14,7 @@ const DB = process.env.DATABASE.replace(
 mongoose
     // .connect(process.env.DATABASE_LOCAL, {
     .connect(DB, {
+        useUnifiedTopology: true,
         useNewUrlParser: true,
         useCreateIndex: true,
         useFindAndModify: false,
