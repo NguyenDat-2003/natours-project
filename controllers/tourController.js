@@ -45,7 +45,9 @@ const getAllTours = async (req, res) => {
         res.status(200).json({
             status: 'success',
             results: tours.length,
-            data: tours,
+            data: {
+                tours,
+            },
         });
     } catch (err) {
         res.status(404).json({
@@ -61,7 +63,9 @@ const getTour = async (req, res) => {
 
         res.status(200).json({
             status: 'success',
-            data: tour,
+            data: {
+                tour,
+            },
         });
     } catch (err) {
         res.status(404).json({
@@ -80,7 +84,9 @@ const updateTour = async (req, res) => {
 
         res.status(200).json({
             status: 'success',
-            data: tour,
+            data: {
+                tour,
+            },
         });
     } catch (err) {
         res.status(404).json({
@@ -106,6 +112,7 @@ const deleteTour = async (req, res) => {
     }
 };
 
+//------------------------------------------Các dạng câu query tổng hợp (Aggregation Pipeline)----------
 const getTourStats = async (req, res) => {
     try {
         const stats = await Tour.aggregate([
@@ -144,6 +151,62 @@ const getTourStats = async (req, res) => {
         });
     }
 };
+
+//----------------Chức năng tính toán tháng bận rộn nhất trong năm----------------
+const getMonthlyPlan = async (req, res) => {
+    try {
+        const year = req.params.year * 1; // 2021
+
+        const plan = await Tour.aggregate([
+            {
+                $unwind: '$startDates',
+            },
+            {
+                $match: {
+                    startDates: {
+                        $gte: new Date(`${year}-01-01`),
+                        $lte: new Date(`${year}-12-31`),
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: { $month: '$startDates' },
+                    numTourStarts: { $sum: 1 },
+                    tours: { $push: '$name' },
+                },
+            },
+            {
+                $addFields: { month: '$_id' },
+            },
+            {
+                //---không hiện _id, set 1 thì mới hiện _id
+                $project: {
+                    _id: 0,
+                },
+            },
+            {
+                //---Sắp xếp giảm dần theo số lượng Tour trong tháng
+                $sort: { numTourStarts: -1 },
+            },
+            // {
+            //     $limit: 6,
+            // },
+        ]);
+
+        res.status(200).json({
+            status: 'success',
+            data: {
+                plan,
+            },
+        });
+    } catch (err) {
+        res.status(404).json({
+            status: 'fail',
+            message: err,
+        });
+    }
+};
 module.exports = {
     createTour,
     aliasTopTours,
@@ -152,4 +215,5 @@ module.exports = {
     updateTour,
     deleteTour,
     getTourStats,
+    getMonthlyPlan,
 };
