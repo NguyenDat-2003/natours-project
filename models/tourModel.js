@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 const toursSchema = new mongoose.Schema(
     {
@@ -8,6 +9,7 @@ const toursSchema = new mongoose.Schema(
             unique: true,
             trim: true,
         },
+        slug: String,
 
         duration: {
             type: Number,
@@ -20,10 +22,6 @@ const toursSchema = new mongoose.Schema(
         difficulty: {
             type: String,
             required: [true, 'A tour must have a difficulty'],
-            enum: {
-                values: ['easy', 'medium', 'difficult'],
-                message: 'Difficulty is either: easy, medium, difficult',
-            },
         },
         ratingsAverage: {
             type: Number,
@@ -75,6 +73,23 @@ const toursSchema = new mongoose.Schema(
 toursSchema.virtual('durationWeeks').get(function () {
     return this.duration / 7;
 });
+
+// ----------------------------------DOCUMENT MIDDLEWARE: runs before .save() and .create()
+toursSchema.pre('save', function (next) {
+    // console.log(this);
+    this.slug = slugify(this.name, { lower: true });
+    next();
+});
+
+// toursSchema.pre('save', function (next) {
+//     console.log('Will save document...');
+//     next();
+// });
+
+// toursSchema.post('save', function (doc, next) {
+//     console.log(doc);
+//     next();
+// });
 
 const Tour = mongoose.model('Tour', toursSchema);
 module.exports = Tour;
