@@ -48,6 +48,7 @@ const deleteData = async () => {
 
 // console.log(process.argv);
 
+//cách run file : node 'file hiện tại' --import
 if (process.argv[2] === '--import') {
     importData();
 } else if (process.argv[2] === '--delete') {
