@@ -34,6 +34,7 @@ const userSchema = new mongoose.Schema({
             message: 'Passwords are not the same!',
         },
     },
+    passwordChangedAt: Date,
 });
 
 //------------------Middleware mã hóa password trước khi lưu vaò database
@@ -56,6 +57,22 @@ userSchema.methods.correctPassword = async function (
 ) {
     return await bcrypt.compare(candidatePassword, userPassword);
 };
-const User = mongoose.model('User', userSchema);
 
+//-------JWTTimestamp: thời gian token được phát hành ("iat")
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+    if (this.passwordChangedAt) {
+        const changedTimestamp = parseInt(
+            this.passwordChangedAt.getTime() / 1000,
+            10
+        );
+        // console.log(changedTimestamp, JWTTimestamp);
+
+        return JWTTimestamp < changedTimestamp;
+    }
+
+    // False means NOT changed
+    return false;
+};
+
+const User = mongoose.model('User', userSchema);
 module.exports = User;
