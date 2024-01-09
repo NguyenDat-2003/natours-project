@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-
 const validator = require('validator');
+
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -40,6 +41,8 @@ const userSchema = new mongoose.Schema({
         },
     },
     passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
 });
 
 //------------------Middleware mã hóa password trước khi lưu vaò database
@@ -79,5 +82,20 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
     return false;
 };
 
+userSchema.methods.createPasswordResetToken = function () {
+    const resetToken = crypto.randomBytes(32).toString('hex');
+
+    this.passwordResetToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+
+    // console.log({ resetToken }, this.passwordResetToken);
+
+    // I need to specify a time to expire this token. In this example is (10 min)
+    this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+    return resetToken;
+};
 const User = mongoose.model('User', userSchema);
 module.exports = User;
