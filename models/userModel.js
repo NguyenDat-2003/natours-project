@@ -57,7 +57,7 @@ userSchema.pre('save', async function (next) {
 
     //12 - salt value, hashing cost //bigger the value strong the encryption be
     this.password = await bcrypt.hash(this.password, 12);
-    this.confirmPassword = undefined; //donot store confirm password in Db
+    this.passwordConfirm = undefined; //donot store confirm password in Db
 
     next();
 });
