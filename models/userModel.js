@@ -43,6 +43,11 @@ const userSchema = new mongoose.Schema({
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
+    active: {
+        type: Boolean,
+        default: true,
+        select: false,
+    },
 });
 
 //------------------Middleware mã hóa password trước khi lưu vaò database
@@ -66,6 +71,12 @@ userSchema.pre('save', function (next) {
     //--Vậy nên cần trừ đi 1 giây để đảm bảo rằng token luôn được tạo sau khi mật khẩu đã được thay đổi.
     //to avoid race condition between updating db and json token creation
     this.passwordChangedAt = Date.now() - 1000;
+    next();
+});
+
+userSchema.pre(/^find/, function (next) {
+    // this points to the current query
+    this.find({ active: { $ne: false } });
     next();
 });
 
