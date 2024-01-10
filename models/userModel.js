@@ -47,14 +47,25 @@ const userSchema = new mongoose.Schema({
 
 //------------------Middleware mã hóa password trước khi lưu vaò database
 userSchema.pre('save', async function (next) {
-    // Only run this function if password was actually modified
+    //Only run this function if password was actually modified
     if (!this.isModified('password')) return next();
 
-    // Hash the password with cost of 12
+    //12 - salt value, hashing cost //bigger the value strong the encryption be
     this.password = await bcrypt.hash(this.password, 12);
+    this.confirmPassword = undefined; //donot store confirm password in Db
 
-    // Delete passwordConfirm field
-    this.passwordConfirm = undefined;
+    next();
+});
+
+//------------------Nếu password bị sửa đổi thì phải cập nhật passwordChangedAt trước khi lưu vaò database
+userSchema.pre('save', function (next) {
+    if (!this.isModified('password') || this.isNew) return next();
+
+    //đôi khi xảy ra trường hợp token
+    //được tạo trước mốc thời gian mật khẩu đã thay đổi
+    //--Vậy nên cần trừ đi 1 giây để đảm bảo rằng token luôn được tạo sau khi mật khẩu đã được thay đổi.
+    //to avoid race condition between updating db and json token creation
+    this.passwordChangedAt = Date.now() - 1000;
     next();
 });
 
