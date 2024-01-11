@@ -136,6 +136,14 @@ tourSchema.virtual('durationWeeks').get(function () {
     return this.duration / 7;
 });
 
+// Virtual populate
+// Tạo ra một trường reviews nhưng không lưu vào db, để giữ một tham chiếu đến tất cả các tài liệu con (Review)
+tourSchema.virtual('reviews', {
+    ref: 'Review',
+    foreignField: 'tour',
+    localField: '_id',
+});
+
 // ----------------------------------DOCUMENT MIDDLEWARE: runs before .save() and .create()
 tourSchema.pre('save', function (next) {
     // console.log(this);
