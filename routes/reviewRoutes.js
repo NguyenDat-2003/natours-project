@@ -2,7 +2,9 @@ const express = require('express');
 const reviewController = require('../controllers/reviewController');
 const authController = require('../controllers/authController');
 
-const router = express.Router();
+//---mergeParams: cho phép truy cập Id từ một route khác
+// EX: router.use('/:tourId/reviews', reviewRouter); ==> reviewRouter có thể truy cập tourId
+const router = express.Router({ mergeParams: true });
 
 router
     .route('/')
