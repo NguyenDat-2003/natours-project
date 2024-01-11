@@ -16,20 +16,16 @@ const reviewSchema = new mongoose.Schema(
             default: Date.now(),
         },
         //----Use Referencing (Parent Referencing)
-        tour: [
-            {
-                type: mongoose.Schema.ObjectId,
-                ref: 'Tour',
-                require: [true, 'Review must belong to a tour'],
-            },
-        ],
-        user: [
-            {
-                type: mongoose.Schema.ObjectId,
-                ref: 'User',
-                require: [true, 'Review must belong to a user'],
-            },
-        ],
+        tour: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Tour',
+            require: [true, 'Review must belong to a tour'],
+        },
+        user: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'User',
+            require: [true, 'Review must belong to a user'],
+        },
     },
     //--Virtuals property sẽ không được lưu trong database
     {
