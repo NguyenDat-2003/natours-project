@@ -87,6 +87,36 @@ const tourSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        //************** Chỉ định dữ liệu không gian địa lý trong MongoDB *************
+        //--startLocation ở đây không thực sự là một document, nó chỉ là một vật thể mô tả một điểm nhất định trên trái đất
+        //--nhưng để tạo ra được những document mới rồi nhúng(embeded) chúng vào một tài liệu khác,thì chúng ta cần tạo một mảng locations.
+        startLocation: {
+            // GeoJSON: là định dạng chuẩn hóa để biểu diễn dữ liệu địa lý dưới dạng JSON.
+            type: {
+                type: String,
+                default: 'Point',
+                enum: ['Point'],
+            },
+            //---Mảng lưu trữ vĩ độ và kinh độ
+            coordinates: [Number],
+            address: String,
+            description: String,
+        },
+        //---Embeded document
+        locations: [
+            {
+                type: {
+                    type: String,
+                    default: 'Point',
+                    enum: ['Point'],
+                },
+                coordinates: [Number],
+                address: String,
+                description: String,
+                //ngày diễn ra chuyến tham quan
+                day: Number,
+            },
+        ],
     },
     {
         toJSON: { virtuals: true },
