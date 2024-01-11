@@ -118,6 +118,7 @@ const tourSchema = new mongoose.Schema(
                 day: Number,
             },
         ],
+        //----Use Referencing (Child Referencing)
         guides: [
             {
                 type: mongoose.Schema.ObjectId,
@@ -142,6 +143,13 @@ tourSchema.pre('save', function (next) {
     next();
 });
 
+tourSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: 'guides',
+        select: '-__v',
+    });
+    next();
+});
 // tourSchema.pre('save', async function (next) {
 //     const guidesPromise = this.guides.map(
 //         async (id) => await User.findById(id)
