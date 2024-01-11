@@ -3,6 +3,7 @@ const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
 
 const createTour = catchAsync(async (req, res, next) => {
     const newTour = await Tour.create(req.body);
@@ -76,18 +77,7 @@ const updateTour = catchAsync(async (req, res) => {
     });
 });
 
-const deleteTour = catchAsync(async (req, res) => {
-    const tour = await Tour.findByIdAndDelete(req.params.id);
-
-    if (!tour) {
-        return next(new AppError('Tour not found', 404));
-    }
-
-    res.status(204).json({
-        status: 'success',
-        data: null,
-    });
-});
+const deleteTour = factory.deleteOne(Tour);
 
 //------------------------------------------Các dạng câu query tổng hợp (Aggregation Pipeline)----------
 const getTourStats = catchAsync(async (req, res) => {
