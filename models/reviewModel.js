@@ -65,16 +65,35 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
     ]);
     // console.log(stats);
 
-    await Tour.findByIdAndUpdate(tourId, {
-        ratingsQuantity: stats[0].nRating,
-        ratingsAverage: stats[0].avgRating,
-    });
+    if (stats.length > 0) {
+        await Tour.findByIdAndUpdate(tourId, {
+            ratingsQuantity: stats[0].nRating,
+            ratingsAverage: stats[0].avgRating,
+        });
+    } else {
+        await Tour.findByIdAndUpdate(tourId, {
+            ratingsQuantity: 0,
+            ratingsAverage: 4.5,
+        });
+    }
 };
 
 //---Hàm này được gọi sau khi một review mới được tạo ra để update 2 fileds ratingsQuantity,ratingsAverage trong db
 reviewSchema.post('save', function () {
     // this points to current review
     this.constructor.calcAverageRatings(this.tour);
+});
+
+// findByIdAndUpdate
+// findByIdAndDelete
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+    this.r = await this.findOne();
+    // console.log(this.r);
+    next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function () {
+    await this.r.constructor.calcAverageRatings(this.r.tour);
 });
 
 const Review = mongoose.model('Review', reviewSchema);
