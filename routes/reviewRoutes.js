@@ -6,11 +6,13 @@ const authController = require('../controllers/authController');
 // EX: router.use('/:tourId/reviews', reviewRouter); ==> reviewRouter có thể truy cập tourId
 const router = express.Router({ mergeParams: true });
 
+//---Protect all routes after this middleware
+router.use(authController.protect);
+
 router
     .route('/')
     .get(authController.protect, reviewController.getAllReviews)
     .post(
-        authController.protect,
         authController.restrictTo('user'),
         reviewController.setTourUserIds,
         reviewController.createReview
@@ -19,9 +21,11 @@ router
 router
     .route('/:id')
     .get(reviewController.getReview)
-    .patch(reviewController.updateReview)
+    .patch(
+        authController.restrictTo('user', 'admin'),
+        reviewController.updateReview
+    )
     .delete(
-        authController.protect,
         authController.restrictTo('user', 'admin'),
         reviewController.deleteReview
     );
