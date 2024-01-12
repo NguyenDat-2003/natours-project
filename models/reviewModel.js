@@ -35,6 +35,9 @@ const reviewSchema = new mongoose.Schema(
     }
 );
 
+//--- một người dùng chỉ có thể viết 1 bài đánh giá cho cùng một chuyến tham quan.
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
 reviewSchema.pre(/^find/, function (next) {
     // this.populate({
     //     path: 'tour',
