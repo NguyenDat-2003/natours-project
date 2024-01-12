@@ -114,7 +114,7 @@ const getToursWithin = catchAsync(async (req, res, next) => {
     //      tours-within/:distance/center/:latlng/unit/:unit
     //  =>  /tours-within/233/center/-40,45/unit/mi
 
-    //lat: vĩ độ, lng: kinh độ
+    //lng: kinh độ, lat: vĩ độ
     const { distance, latlng, unit } = req.params;
     const [lat, lng] = latlng.split(',');
 
@@ -142,6 +142,51 @@ const getToursWithin = catchAsync(async (req, res, next) => {
     });
 });
 
+const getDistances = catchAsync(async (req, res, next) => {
+    const { latlng, unit } = req.params;
+    const [lat, lng] = latlng.split(',');
+
+    //--mi: là đơn vị dặm
+    const multiplier = unit === 'mi' ? 0.000621371192 : 0.001;
+
+    if (!lat || !lng) {
+        next(
+            new AppError(
+                'Please provide latitute and longitude in the format lat,lng.',
+                400
+            )
+        );
+    }
+
+    const distances = await Tour.aggregate([
+        {
+            $geoNear: {
+                near: {
+                    type: 'Point',
+                    //lng: kinh độ, lat: vĩ độ
+                    coordinates: [lng * 1, lat * 1],
+                },
+                distanceField: 'distance',
+                distanceMultiplier: multiplier,
+            },
+        },
+        //--- $project: tên các trường muốn giữ lại
+        {
+            $project: {
+                distance: 1,
+                name: 1,
+            },
+        },
+    ]);
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            data: distances,
+        },
+    });
+});
+
 module.exports = {
     createTour,
     aliasTopTours,
@@ -153,4 +198,5 @@ module.exports = {
     getMonthlyPlan,
     setTourId,
     getToursWithin,
+    getDistances,
 };
