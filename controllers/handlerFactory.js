@@ -27,6 +27,7 @@ const getAll = (Model) => {
         });
     });
 };
+
 const getOne = (Model, popOptions) => {
     return catchAsync(async (req, res, next) => {
         let query = Model.findById(req.params.id);

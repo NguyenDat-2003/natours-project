@@ -52,6 +52,11 @@ const deleteMe = catchAsync(async (req, res, next) => {
     });
 });
 
+const getMe = (req, res, next) => {
+    req.params.id = req.user.id;
+    next();
+};
+
 const getAllUsers = factory.getAll(User);
 
 const getUser = factory.getOne(User);
@@ -70,4 +75,5 @@ module.exports = {
     deleteUser,
     updateMe,
     deleteMe,
+    getMe,
 };
