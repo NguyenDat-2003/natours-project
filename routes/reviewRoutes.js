@@ -11,7 +11,7 @@ router.use(authController.protect);
 
 router
     .route('/')
-    .get(authController.protect, reviewController.getAllReviews)
+    .get(reviewController.getAllReviews)
     .post(
         authController.restrictTo('user'),
         reviewController.setTourUserIds,
