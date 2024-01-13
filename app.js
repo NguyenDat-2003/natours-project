@@ -52,8 +52,19 @@ app.use((req, res, next) => {
 // 3) ROUTES
 app.get('/', (req, res) => {
     res.render('base', {
-        tour: 'The Forest Hiker',
-        user: 'Nguyễn Đạt',
+        title: 'The Forest Hiker',
+    });
+});
+
+app.get('/overview', (req, res) => {
+    res.render('overview', {
+        title: 'All Tours',
+    });
+});
+
+app.get('/tour', (req, res) => {
+    res.render('tour', {
+        title: 'Tour',
     });
 });
 
