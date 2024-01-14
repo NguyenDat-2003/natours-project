@@ -24,4 +24,12 @@ const getTour = catchAsync(async (req, res) => {
         tour,
     });
 });
-module.exports = { getOverview, getTour };
+
+const getLoginForm = catchAsync(async (req, res) => {
+    const { email, password } = req.body;
+
+    res.status(200).render('login', {
+        title: 'Log In',
+    });
+});
+module.exports = { getOverview, getTour, getLoginForm };
