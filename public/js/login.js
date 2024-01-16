@@ -19,7 +19,7 @@ const login = async (email, password) => {
     }
 };
 
-document.querySelector('.form').addEventListener('submit', (e) => {
+document.querySelector('.form--login').addEventListener('submit', (e) => {
     e.preventDefault();
     const email = document.querySelector('#email').value;
     const password = document.querySelector('#password').value;
