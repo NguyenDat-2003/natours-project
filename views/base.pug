@@ -7,6 +7,8 @@ html(lang="en")
         link(rel="shortcut icon", href="/img/favicon.png")
         link(rel="stylesheet", href="/css/style.css")
         title Natours | #{title}
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.5/axios.min.js" integrity="sha512-TjBzDQIDnc6pWyeM1bhMnDxtWH0QpOXMcVooglXrali/Tj7W569/wd4E8EDjk1CwOAOPSJon1VfcEt1BI4xIrA==" crossorigin="anonymous" referrerpolicy="no-referrer")
+        
 
     body
         //--------------------HEADER-----------------------
@@ -18,8 +20,8 @@ html(lang="en")
 
         //--------------------------------FOOTER---------------------------
         include _footer
-        script(src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.5/axios.min.js")
-        script(src='/js/index.js')
+        script(type='module' src='/js/index.js')
+       
 
 
 

@@ -26,15 +26,8 @@ const getTour = catchAsync(async (req, res) => {
 });
 
 const getLoginForm = catchAsync(async (req, res) => {
-    const { email, password } = req.body;
-
-    res.status(200)
-        .set(
-            'Content-Security-Policy',
-            "connect-src 'self' http://127.0.0.1:3000/"
-        )
-        .render('login', {
-            title: 'Log In',
-        });
+    res.status(200).render('login', {
+        title: 'Log In',
+    });
 });
 module.exports = { getOverview, getTour, getLoginForm };
