@@ -1,20 +1,23 @@
 const multer = require('multer');
+const sharp = require('sharp');
 
 const User = require('../models/userModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'public/img/users');
-    },
-    filename: function (req, file, cb) {
-        const ext = file.mimetype.split('/')[1];
-        const uniqueSuffix = `user-${req.user.id}-${Date.now()}.${ext}`;
-        cb(null, uniqueSuffix);
-    },
-});
+// const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         cb(null, 'public/img/users');
+//     },
+//     filename: function (req, file, cb) {
+//         const ext = file.mimetype.split('/')[1];
+//         const uniqueSuffix = `user-${req.user.id}-${Date.now()}.${ext}`;
+//         cb(null, uniqueSuffix);
+//     },
+// });
+
+const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
     if (file.mimetype.startsWith('image')) {
@@ -27,8 +30,23 @@ const multerFilter = (req, file, cb) => {
     }
 };
 
-const upload = multer({ storage: storage, fileFilter: multerFilter });
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 const uploadUserPhoto = upload.single('photo');
+
+const resizeUserPhoto = async (req, res, next) => {
+    if (!req.file) return next();
+
+    req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+
+    //--- Tên file mới được lưu vào bộ nhớ đệm máy tính req.file.buffer
+    await sharp(req.file.buffer)
+        .resize(500, 500)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/users/${req.file.filename}`);
+
+    next();
+};
 
 const filterObj = (obj, ...allowedFields) => {
     const newObj = {};
@@ -105,4 +123,5 @@ module.exports = {
     deleteMe,
     getMe,
     uploadUserPhoto,
+    resizeUserPhoto,
 };
