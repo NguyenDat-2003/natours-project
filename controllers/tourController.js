@@ -1,5 +1,6 @@
 const fs = require('fs');
 const multer = require('multer');
+const sharp = require('sharp');
 
 const Tour = require('../models/tourModel');
 const catchAsync = require('../utils/catchAsync');
@@ -28,8 +29,36 @@ const uploadTourImages = upload.fields([
 // upload.single('image') req.file
 // upload.array('images', 5) req.files
 
-const resizeTourImages = (req, res, next) => {
-    console.log(req.files);
+const resizeTourImages = async (req, res, next) => {
+    // console.log(req.files);
+    if (!req.files.imageCover || !req.files.images) return next();
+    // 1) ImageCover
+    req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+
+    await sharp(req.files.imageCover[0].buffer)
+        //--Hình ảnh tỉ lệ 2:3
+        .resize(2000, 1333)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/tours/${req.body.imageCover}`);
+
+    // 2) Images
+    req.body.images = [];
+    await Promise.all(
+        req.files.images.map(async (file, index) => {
+            const fileName = `tour-${req.params.id}-${Date.now()}-${
+                index + 1
+            }-cover.jpeg`;
+            await sharp(file.buffer)
+                //--Hình ảnh tỉ lệ 2:3
+                .resize(2000, 1333)
+                .toFormat('jpeg')
+                .jpeg({ quality: 90 })
+                .toFile(`public/img/tours/${fileName}`);
+
+            req.body.images.push(fileName);
+        })
+    );
     next();
 };
 
