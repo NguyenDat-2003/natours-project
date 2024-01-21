@@ -66,8 +66,8 @@ const handleCastErrorDB = (err) => {
 const handleDuplicateFieldsDB = (err) => {
     const key = { ...Object.keys(err.keyValue) };
     const value = { ...Object.values(err.keyValue) };
-    console.log(key);
-    console.log(value);
+    // console.log(key);
+    // console.log(value);
     const message = `Duplicate field with field '${key[0]}' : '${value[0]}'. Use another ${key[0]} }`;
     return new AppError(message, 400);
 };
